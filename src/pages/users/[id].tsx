@@ -26,41 +26,36 @@ export default function User() {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps((store) => async ({ params }) => {
-  await store.dispatch(userService.endpoints.getUser.initiate(params?.id));
-  await Promise.all(userService.util.getRunningOperationPromises()); //так просто надо
-  return {
-    props: {},
-    //initialReduxState: store.getState() внутри props нужен для создания store при передаче в Provider в файле _app
-    // но так как использую wrapper.withRedux, то не нужно это делать
-  };
-});
+// export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps((store) => async ({ params }) => {
+//   await store.dispatch(userService.endpoints.getUser.initiate(params?.id));
+//   await Promise.all(userService.util.getRunningOperationPromises()); //так просто надо
+//   return {
+//     props: {},
+//     //initialReduxState: store.getState() внутри props нужен для создания store при передаче в Provider в файле _app
+//     // но так как использую wrapper.withRedux, то не нужно это делать
+//   };
+// });
 
 // In order to avoid providing stale data with Static Site Generation (SSG), you may wish to set refetchOnMountOrArgChange
 // to a reasonable value such as 900 (seconds) in order to allow data to be re-fetched when accessed if it has been that
 // long since the page was generated.
 
-// export const getStaticPaths = async () => {
-//   //Так почему-то не получилось, как в примере, жалуется на Expected signal to be an instanceof AbortSignal
-//   // const store = getStore();
-//   // const result = await store.dispatch(userService.endpoints.getUsers.initiate());
-//   // console.log(12345, result);
+export const getStaticPaths = async () => {
+  const store = getStore();
+  const result = await store.dispatch(userService.endpoints.getUsers.initiate());
+  return {
+    paths: result.data?.map((p: any) => ({ params: { id: p.id.toString() } })),
+    fallback: true,
+  };
+};
 
-//   const result = await (await fetch('https://jsonplaceholder.typicode.com/users')).json();
-
-//   return {
-//     paths: result.map((p: any) => ({ params: { id: p.id.toString() } })),
-//     fallback: true,
-//   };
-// };
-
-// export const getStaticProps: GetStaticProps = wrapper.getStaticProps((store) => async ({ params }) => {
-//   await store.dispatch(userService.endpoints.getUser.initiate(params?.id));
-//   await Promise.all(userService.util.getRunningOperationPromises());
-//   return {
-//     props: {},
-//   };
-// });
+export const getStaticProps: GetStaticProps = wrapper.getStaticProps((store) => async ({ params }) => {
+  await store.dispatch(userService.endpoints.getUser.initiate(params?.id));
+  await Promise.all(userService.util.getRunningOperationPromises());
+  return {
+    props: {},
+  };
+});
 
 // export const getStaticPaths: GetStaticPaths = async (context: GetStaticPathsContext) => {
 //   const users = await (await fetch('https://jsonplaceholder.typicode.com/users'))?.json();
