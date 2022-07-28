@@ -13,9 +13,12 @@ import '../styles/global.css';
 // https://github.com/vercel/next.js/tree/canary/examples - официальные примеры
 // https://github.com/phryneas/ssr-experiments/tree/main/nextjs-blog - пример с rtk query
 
+import { Headers, Request, Response } from 'node-fetch'; //fetch,
 import { AbortController } from 'abort-controller';
-import fetch, { Headers, Request, Response } from 'node-fetch';
-
+// @ts-ignore
+global.AbortController = AbortController;
+// @ts-ignore
+import fetch from 'isomorphic-fetch';
 //без этого работать не будет
 Object.assign(globalThis, {
   // fetch: abortableFetch(fetch).fetch,
