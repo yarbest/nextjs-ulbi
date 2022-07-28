@@ -29,6 +29,8 @@ import '../styles/global.css';
 //   AbortController,
 // });
 
+//это все теперь не нужно, так как Нода 15 версии
+
 function MyApp({ Component, pageProps }: AppProps) {
   // const store = getStore();
   return (
