@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import A from './A';
+import A from '@components/A';
 
 const MainContainer = ({ children, keywords }) => {
   return (
