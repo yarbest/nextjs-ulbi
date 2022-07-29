@@ -8,12 +8,13 @@ import MainContainer from '../../components/MainContainer';
 import styles from '../../styles/user.module.scss';
 import { counterSlice, selectCounter } from 'src/store/slices/counterSlice';
 
-export default function User() {
+export default function User({ time }: any) {
   const router = useRouter();
   const { data: user } = userService.useGetUserQuery(router.query.id);
   const counter = useSelector(selectCounter);
 
   const dispatch = useDispatch();
+
   return (
     <MainContainer keywords={user?.name}>
       <div className={styles.user}>
@@ -21,6 +22,8 @@ export default function User() {
         <div>Name: {user?.name}</div>
         {counter}
         <button onClick={() => dispatch(counterSlice.actions.increment(counter + 1))}>inc</button>
+        <button onClick={() => fetch(`/api/revalidate?route=${router.asPath}`)}>revalidate this page</button>
+        <div>{time}</div>
       </div>
     </MainContainer>
   );
@@ -43,9 +46,11 @@ export default function User() {
 export const getStaticPaths = async () => {
   const store = getStore();
   const result = await store.dispatch(userService.endpoints.getUsers.initiate());
+  console.log(result);
+
   return {
     paths: result.data?.map((p: any) => ({ params: { id: p.id.toString() } })),
-    fallback: true,
+    fallback: true, //!!!!!!
   };
 };
 
@@ -53,7 +58,9 @@ export const getStaticProps: GetStaticProps = wrapper.getStaticProps((store) => 
   await store.dispatch(userService.endpoints.getUser.initiate(params?.id));
   await Promise.all(userService.util.getRunningOperationPromises());
   return {
-    props: {},
+    props: {
+      time: new Date().toLocaleTimeString(), //проверять, что время то же самое при обновлении страницы - надо в prod режиме, иначе getStaticProps будет на каждый запрос
+    },
   };
 });
 
